@@ -1,0 +1,12 @@
+{
+  "name": "webrtc-test",
+  "version": "0.0.0",
+  "dependencies": {
+    "pure": "~0.2.0",
+    "requirejs": "~2.1.4",
+    "modernizr": "~2.6.2",
+    "jquery": "~1.9.1",
+    "peerjs": "~0.3.11"
+  },
+  "devDependencies": {}
+}
