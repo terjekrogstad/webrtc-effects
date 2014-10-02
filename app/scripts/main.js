@@ -19,7 +19,6 @@ require(['app', 'jquery'], function (app, $) {
 
 
 
-
 //Peerjs test
 (function(){
     
@@ -37,6 +36,9 @@ require(['app', 'jquery'], function (app, $) {
 	ctx = canvas.getContext( '2d' ),//Invisible canvas
 	ctxv = canvasv.getContext( '2d' );
 
+	var cw = video.width;
+	var ch = video.height;
+
     if( navigator.userAgent !== target ){
 	var peer = new Peer('sender', {host: '192.168.0.113', port: 9001, path: '/'});
 	console.log( "I'm going to send something" );
@@ -52,12 +54,10 @@ require(['app', 'jquery'], function (app, $) {
     }else{
 	console.log( "I'm going to receive something" );
 	var peer = new Peer( 'receiver', {host: '192.168.0.113', port: 9001, path: '/'});
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-	peer.on('call', function(call) {
+        peer.on('call', function(call) {
 		console.log( 'Receiving call' );
-	  navigator.getUserMedia({video: false, audio: true}, function(stream) {
-		console.log( 'Media set up. Answering call' );
-	    call.answer(stream); // Answer the call with an A/V stream.
+	  	console.log( 'Media set up. Answering call' );
+	    call.answer(); // Answer the call with an A/V stream.
 	    call.on('stream', function(remoteStream) {
 	      // Show stream in some video/canvas element.
 		console.log( 'Setting up remote stream', remoteStream );
@@ -67,25 +67,24 @@ require(['app', 'jquery'], function (app, $) {
 		
 		//Stream alter
 		jQuery( canvasv ).css( 'display', 'block' );
-		//frame();
+		jQuery( canvas ).css( 'display', 'block' );
+		
+		frame();
 
-
-
-	    });
-	  }, function(err) {
+	}, function(err) {
 	    console.log('Failed to get local stream' ,err);
 	  });
 	});
     }
 
 
-
 	function frame(){
-		console.log( 'Running frame' );
+		//console.log( 'Running frame' );
 	    if(video.paused || video.ended) return false;
 	    // First, draw it into the backing canvas
-	    var cw = jQuery( video ).width();
-	    var ch = jQuery( video ).height();
+
+	    console.log( cw, ch );
+	    
 	    ctx.drawImage(video,0,0,cw,ch);
 	    // Grab the pixel data from the backing canvas
 	    var idata = ctx.getImageData(0,0,cw,ch);
@@ -94,11 +93,11 @@ require(['app', 'jquery'], function (app, $) {
 	    var limit = data.length
 	    // Loop through the subpixels, convoluting each using an edge-detection matrix.
 	    for(var i = 0; i < limit; i++) {
-		if( i%4 == 3 ) continue;
-		data[i] = 127 + 2*data[i] - data[i + 4] - data[i + w*4];
+			if( i%4 == 3 ) continue;
+			data[i] = 127 + 2*data[i] - data[i + 4] - data[i + w*4];
 	    }
 	    // Draw the pixels onto the visible canvas
-	    ctx.putImageData(idata,0,0);
+	    ctxv.putImageData(idata,0,0);
 	    // Start over!
 	    setTimeout(frame, 20);
 	}
